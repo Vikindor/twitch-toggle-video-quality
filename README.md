@@ -32,8 +32,8 @@ Designed for users who want fast quality control without opening the player sett
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) (or another userscript manager).
 2. Install the script from one of the mirrors:
-   - [GreasyFork](https://greasyfork.org/en/scripts/...)
-   - [OpenUserJS](https://openuserjs.org/scripts/Vikindor/...)
+   - [GreasyFork](https://greasyfork.org/en/scripts/566269-twitch-toggle-video-quality)
+   - [OpenUserJS](https://openuserjs.org/scripts/Vikindor/Twitch_-_Toggle_Video_Quality)
    - Or [install directly from this repository](./Twitch_-_Toggle_Video_Quality.js).
 
 ## 🔧 Configuration
