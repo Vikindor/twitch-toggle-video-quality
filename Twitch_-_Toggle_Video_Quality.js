@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      0.9.0
+// @version      1.0.0
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -15,23 +15,58 @@
   'use strict';
 
   // ---------------- CONFIG ----------------
-
   // Preferred HIGH resolution.
   // Set a number (e.g. 1080) to try switching to that exact height.
   // If not available on the stream, the script falls back to the highest available quality.
-  // Set to 'null' to always use the maximum available quality.
+  // Set to "null" to always use the maximum available quality.
   const PREFERRED_HIGH = 1080;
 
-  // When switching to the lowest quality,
-  // automatically mute the player (true / false).
+  // When switching to the lowest quality, automatically mute the player (true / false)
   const MUTE_ON_LOW = true;
 
-  // VISUAL_MODE:
-  // 'minimal' -> small "Q" button inside player controls (bottom-right of video)
-  // 'header'  -> purple "Quality" button in the channel header (next to Subscribe)
-  const VISUAL_MODE = 'header';
+  // Persist quality + mute state across reload
+  const PERSIST_SELECTION = true;
 
+  // 'minimal' -> small "Q" button inside player controls (bottom-right of video)
+  // 'header'  -> purple "Quality" button in the channel header (next to "Subscribe")
+  const VISUAL_MODE = 'header';
   // ----------------------------------------
+
+  function persistQuality(group) {
+    if (!PERSIST_SELECTION) return;
+
+    try {
+      localStorage.setItem(
+        'video-quality',
+        JSON.stringify({ default: group })
+      );
+    } catch (e) {}
+  }
+
+  function persistMute(isMuted) {
+    if (!PERSIST_SELECTION || !MUTE_ON_LOW) return;
+
+    try {
+      localStorage.setItem(
+        'video-muted',
+        JSON.stringify({ default: String(isMuted) })
+      );
+    } catch (e) {}
+  }
+
+  function restoreMute(player) {
+    if (!PERSIST_SELECTION || !MUTE_ON_LOW) return;
+
+    try {
+      const raw = localStorage.getItem('video-muted');
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw);
+      const isMuted = parsed?.default === 'true';
+
+      player.setMuted(isMuted);
+    } catch (e) {}
+  }
 
   function getTwitchPlayer() {
     const node = document.querySelector('[data-a-target="video-player"]');
@@ -105,9 +140,15 @@
     if (isCurrentlyLowest) {
       player.setQuality(high);
       player.setMuted(false);
+      persistQuality(high.group);
+      persistMute(false);
     } else {
       player.setQuality(lowest);
-      if (MUTE_ON_LOW) player.setMuted(true);
+      if (MUTE_ON_LOW) {
+        player.setMuted(true);
+        persistMute(true);
+      }
+      persistQuality(lowest.group);
     }
   }
 
@@ -154,25 +195,19 @@
     btn.style.display = 'flex';
     btn.style.alignItems = 'center';
     btn.style.justifyContent = 'center';
-
     btn.style.height = '32px';
     btn.style.padding = '0 12px';
-
     btn.style.border = '0';
     btn.style.boxSizing = 'border-box';
     btn.style.cursor = 'pointer';
-
     btn.style.fontFamily = 'Inter, inherit';
     btn.style.fontSize = '14px';
     btn.style.fontWeight = '600';
     btn.style.lineHeight = '19.6px';
-
     btn.style.borderRadius = '9000px';
     btn.style.marginLeft = '8px';
-
     btn.style.backgroundColor = '#9147ff';
     btn.style.color = 'white';
-
     btn.style.transition = 'background-color 0.15s ease';
 
     const svg = document.createElementNS(
@@ -218,7 +253,19 @@
   }
 
   function observeUI() {
+    let muteRestored = false;
+
     const observer = new MutationObserver(() => {
+      const player = getTwitchPlayer();
+
+      if (player && !muteRestored) {
+        setTimeout(() => {
+          restoreMute(player);
+        }, 500);
+
+        muteRestored = true;
+      }
+
       if (VISUAL_MODE === 'minimal') {
         insertMinimalButton();
       } else if (VISUAL_MODE === 'header') {
