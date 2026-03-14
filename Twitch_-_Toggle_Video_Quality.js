@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.1.0
+// @version      1.2.0
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -29,8 +29,50 @@
 
   // 'minimal' -> small icon button inside player controls (bottom-right of video)
   // 'header'  -> purple "Quality" button in the channel header (next to "Subscribe")
-  const VISUAL_MODE = 'minimal';
+  const VISUAL_MODE = 'header';
   // ----------------------------------------
+
+  const QUALITY_BUTTON_LABELS = {
+    en: 'Quality',
+    da: 'Kvalitet',
+    de: 'Qualität',
+    es: 'Calidad',
+    fr: 'Qualité',
+    it: 'Qualità',
+    hu: 'Minőség',
+    nl: 'Kwaliteit',
+    no: 'Kvalitet',
+    pl: 'Jakość',
+    pt: 'Qualidade',
+    ro: 'Calitate',
+    sk: 'Kvalita',
+    fi: 'Laatu',
+    sv: 'Kvalitet',
+    vi: 'Chất lượng',
+    tr: 'Kalite',
+    cs: 'Kvalita',
+    el: 'Ποιότητα',
+    bg: 'Качество',
+    ru: 'Качество',
+    uk: 'Якість',
+    th: 'คุณภาพ',
+    ar: 'الجودة',
+	'zh-cn': '画质',
+	'zh-tw': '畫質',
+    ja: '画質',
+    ko: '화질'
+  };
+
+  function getQualityButtonLabel() {
+    const lang = (document.documentElement.lang || 'en').toLowerCase();
+
+    if (QUALITY_BUTTON_LABELS[lang]) {
+      return QUALITY_BUTTON_LABELS[lang];
+    }
+
+    const baseLang = lang.split('-')[0];
+    return QUALITY_BUTTON_LABELS[baseLang] || QUALITY_BUTTON_LABELS.en;
+  }
 
   function persistQuality(group) {
     if (!PERSIST_SELECTION) return;
@@ -240,7 +282,7 @@
     const svg = createQualityIcon(16, '6px');
 
     const label = document.createElement('span');
-    label.textContent = 'Quality';
+    label.textContent = getQualityButtonLabel();
 
     btn.appendChild(svg);
     btn.appendChild(label);
