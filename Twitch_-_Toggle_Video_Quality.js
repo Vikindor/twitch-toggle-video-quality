@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.0.1
+// @version      1.1.0
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -27,9 +27,9 @@
   // Persist quality + mute state across reload
   const PERSIST_SELECTION = true;
 
-  // 'minimal' -> small "Q" button inside player controls (bottom-right of video)
+  // 'minimal' -> small icon button inside player controls (bottom-right of video)
   // 'header'  -> purple "Quality" button in the channel header (next to "Subscribe")
-  const VISUAL_MODE = 'header';
+  const VISUAL_MODE = 'minimal';
   // ----------------------------------------
 
   function persistQuality(group) {
@@ -138,30 +138,71 @@
     }
   }
 
+  function createQualityIcon(size = 16, marginRight = '0') {
+    const svg = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'svg'
+    );
+    svg.setAttribute('width', String(size));
+    svg.setAttribute('height', String(size));
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '1.5');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.style.marginRight = marginRight;
+
+    svg.innerHTML = `
+      <line x1="5" y1="6" x2="19" y2="6"></line>
+      <circle cx="9" cy="6" r="1.6"></circle>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+      <circle cx="15" cy="12" r="1.6"></circle>
+      <line x1="5" y1="18" x2="19" y2="18"></line>
+      <circle cx="11" cy="18" r="1.6"></circle>
+    `;
+
+    return svg;
+  }
+
   function insertMinimalButton() {
     if (document.getElementById('quality-toggle-btn')) return;
-
+  
     const rightGroup = document.querySelector(
       '[data-a-target="player-controls"] .player-controls__right-control-group'
     );
-
+  
     if (!rightGroup) return;
-
+  
     const btn = document.createElement('button');
     btn.id = 'quality-toggle-btn';
     btn.type = 'button';
-    btn.textContent = 'Q';
-
+  
     btn.style.background = 'transparent';
     btn.style.color = 'white';
     btn.style.border = 'none';
     btn.style.cursor = 'pointer';
-    btn.style.fontWeight = 'bold';
     btn.style.padding = '0 8px';
     btn.style.height = '100%';
-
+    btn.style.display = 'flex';
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+    btn.style.borderRadius = '9999px';
+    btn.style.transition = 'background-color 0.15s ease';
+  
+    const svg = createQualityIcon(18);
+    btn.appendChild(svg);
+  
+    btn.addEventListener('mouseenter', () => {
+      btn.style.backgroundColor = 'rgba(255, 255, 255, 0.13)';
+    });
+  
+    btn.addEventListener('mouseleave', () => {
+      btn.style.backgroundColor = 'transparent';
+    });
+  
     btn.addEventListener('click', toggleQuality);
-
+  
     rightGroup.appendChild(btn);
   }
 
@@ -196,28 +237,7 @@
     btn.style.color = 'white';
     btn.style.transition = 'background-color 0.15s ease';
 
-    const svg = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg'
-    );
-    svg.setAttribute('width', '16');
-    svg.setAttribute('height', '16');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '2');
-    svg.setAttribute('stroke-linecap', 'round');
-    svg.setAttribute('stroke-linejoin', 'round');
-    svg.style.marginRight = '6px';
-
-    svg.innerHTML = `
-      <line x1="4" y1="6" x2="20" y2="6"></line>
-      <circle cx="9" cy="6" r="2"></circle>
-      <line x1="4" y1="12" x2="20" y2="12"></line>
-      <circle cx="15" cy="12" r="2"></circle>
-      <line x1="4" y1="18" x2="20" y2="18"></line>
-      <circle cx="11" cy="18" r="2"></circle>
-    `;
+    const svg = createQualityIcon(16, '6px');
 
     const label = document.createElement('span');
     label.textContent = 'Quality';
