@@ -13,7 +13,7 @@ Designed for users who want fast quality control without opening the player sett
 - Optional **auto-mute when switching to lowest quality**.
 - Optional **persistent selection** (quality and mute status survive page reload).
 - Two UI modes:
-  - **Minimal** -- small `Q` button inside player controls.
+  - **Minimal** -- small icon button inside player controls.
   - **Header** -- purple "Quality" button in the channel header (next to "Subscribe").
 - **Localized button label** — automatically matches the Twitch interface language.
 - **RTL-aware layout** — spacing adapts correctly for right-to-left interface (Arabic).
