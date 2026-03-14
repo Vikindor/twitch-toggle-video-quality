@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.2.0
+// @version      1.2.1
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -180,7 +180,7 @@
     }
   }
 
-  function createQualityIcon(size = 16, marginRight = '0') {
+  function createQualityIcon(size = 18, strokeWidth = 1.5, marginInlineEnd = 0) {
     const svg = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'svg'
@@ -190,10 +190,10 @@
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('fill', 'none');
     svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '1.5');
+    svg.setAttribute('stroke-width', strokeWidth);
     svg.setAttribute('stroke-linecap', 'round');
     svg.setAttribute('stroke-linejoin', 'round');
-    svg.style.marginRight = marginRight;
+    svg.style.marginInlineEnd = marginInlineEnd + 'px';
 
     svg.innerHTML = `
       <line x1="5" y1="6" x2="19" y2="6"></line>
@@ -232,7 +232,7 @@
     btn.style.borderRadius = '9999px';
     btn.style.transition = 'background-color 0.15s ease';
   
-    const svg = createQualityIcon(18);
+    const svg = createQualityIcon(18, 2);
     btn.appendChild(svg);
   
     btn.addEventListener('mouseenter', () => {
@@ -274,12 +274,12 @@
     btn.style.fontWeight = '600';
     btn.style.lineHeight = '19.6px';
     btn.style.borderRadius = '9000px';
-    btn.style.marginLeft = '8px';
+    btn.style.marginInlineStart = '8px';
     btn.style.backgroundColor = '#9147ff';
     btn.style.color = 'white';
     btn.style.transition = 'background-color 0.15s ease';
 
-    const svg = createQualityIcon(16, '6px');
+    const svg = createQualityIcon(24, 1.5, 6);
 
     const label = document.createElement('span');
     label.textContent = getQualityButtonLabel();
