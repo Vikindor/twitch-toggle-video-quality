@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.2.1
+// @version      1.2.2
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -24,7 +24,7 @@
   // When switching to the lowest quality, automatically mute the player (true / false)
   const MUTE_ON_LOW = true;
 
-  // Persist quality + mute state across reload
+  // Persist quality + mute state across reload (true / false)
   const PERSIST_SELECTION = true;
 
   // 'minimal' -> small icon button inside player controls (bottom-right of video)
