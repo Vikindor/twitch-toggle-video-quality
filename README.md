@@ -15,6 +15,8 @@ Designed for users who want fast quality control without opening the player sett
 - Two UI modes:
   - **Minimal** -- small `Q` button inside player controls.
   - **Header** -- purple "Quality" button in the channel header (next to "Subscribe").
+- **Localized button label** — automatically matches the Twitch interface language.
+- **RTL-aware layout** — spacing adapts correctly for right-to-left interface (Arabic).
 - Uses Twitch's internal player API (no UI clicking).
 - Fully client-side. No external dependencies.
 
