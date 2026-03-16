@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.2.2
+// @version      1.2.3
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -180,30 +180,28 @@
     }
   }
 
-  function createQualityIcon(size = 18, strokeWidth = 1.5, marginInlineEnd = 0) {
+  function createQualityIcon() {
     const svg = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'svg'
     );
-    svg.setAttribute('width', String(size));
-    svg.setAttribute('height', String(size));
+    svg.setAttribute('width', '24');
+    svg.setAttribute('height', '24');
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', strokeWidth);
-    svg.setAttribute('stroke-linecap', 'round');
-    svg.setAttribute('stroke-linejoin', 'round');
-    svg.style.marginInlineEnd = marginInlineEnd + 'px';
+    svg.setAttribute('aria-hidden', 'true');
 
-    svg.innerHTML = `
-      <line x1="5" y1="6" x2="19" y2="6"></line>
-      <circle cx="9" cy="6" r="1.6"></circle>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-      <circle cx="15" cy="12" r="1.6"></circle>
-      <line x1="5" y1="18" x2="19" y2="18"></line>
-      <circle cx="11" cy="18" r="1.6"></circle>
-    `;
+    const path = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'path'
+    );
+    path.setAttribute('fill', 'currentColor');
+    path.setAttribute(
+      'd',
+      'M4.25 6.5a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5h-14a.75.75 0 0 1-.75-.75Zm2.75 0a1.65 1.65 0 1 0 3.3 0 1.65 1.65 0 0 0-3.3 0ZM4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5h-14a.75.75 0 0 1-.75-.75Zm8.5 0a1.65 1.65 0 1 0 3.3 0 1.65 1.65 0 0 0-3.3 0ZM4.25 17.5a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5h-14a.75.75 0 0 1-.75-.75Zm4.75 0a1.65 1.65 0 1 0 3.3 0 1.65 1.65 0 0 0-3.3 0Z'
+    );
 
+    svg.appendChild(path);
     return svg;
   }
 
@@ -224,15 +222,16 @@
     btn.style.color = 'white';
     btn.style.border = 'none';
     btn.style.cursor = 'pointer';
-    btn.style.padding = '0 8px';
-    btn.style.height = '100%';
+    btn.style.width = '32px';
+    btn.style.height = '32px';
+    btn.style.padding = '0';
     btn.style.display = 'flex';
     btn.style.alignItems = 'center';
     btn.style.justifyContent = 'center';
     btn.style.borderRadius = '9999px';
     btn.style.transition = 'background-color 0.15s ease';
   
-    const svg = createQualityIcon(18, 2);
+    const svg = createQualityIcon(24, 1.25);
     btn.appendChild(svg);
   
     btn.addEventListener('mouseenter', () => {
@@ -279,10 +278,11 @@
     btn.style.color = 'white';
     btn.style.transition = 'background-color 0.15s ease';
 
-    const svg = createQualityIcon(24, 1.5, 6);
+    const svg = createQualityIcon();
 
     const label = document.createElement('span');
     label.textContent = getQualityButtonLabel();
+    label.style.paddingInline = '6px';
 
     btn.appendChild(svg);
     btn.appendChild(label);
