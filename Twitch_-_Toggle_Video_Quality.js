@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.2.3
+// @version      1.2.4
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -134,6 +134,24 @@
   function extractHeight(q) {
     const match = q.name.match(/^(\d+)/);
     return match ? parseInt(match[1], 10) : 0;
+  }
+
+  function removeQualityButton() {
+    document.getElementById('quality-toggle-btn')?.remove();
+  }
+
+  function getButtonContainer() {
+    if (VISUAL_MODE === 'minimal') {
+      return document.querySelector(
+        '[data-a-target="player-controls"] .player-controls__right-control-group'
+      );
+    }
+
+    if (VISUAL_MODE === 'header') {
+      return document.querySelector('[data-target="channel-header-right"]');
+    }
+
+    return null;
   }
 
   function toggleQuality() {
@@ -301,18 +319,90 @@
   }
 
   function observeUI() {
-    const observer = new MutationObserver(() => {
-      if (VISUAL_MODE === 'minimal') {
-        insertMinimalButton();
-      } else if (VISUAL_MODE === 'header') {
-        insertHeaderButton();
-      }
-    });
+    let syncScheduled = false;
+    let uiObserver = null;
+    let uiObserverTimeoutId = null;
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    function syncButton() {
+      syncScheduled = false;
+
+      if (getButtonContainer()) {
+        if (VISUAL_MODE === 'minimal') {
+          insertMinimalButton();
+        } else if (VISUAL_MODE === 'header') {
+          insertHeaderButton();
+        }
+      } else {
+        removeQualityButton();
+      }
+    }
+
+    function scheduleSync() {
+      if (syncScheduled) return;
+      syncScheduled = true;
+      requestAnimationFrame(syncButton);
+    }
+
+    function stopUIBootstrapObserver() {
+      if (uiObserver) {
+        uiObserver.disconnect();
+        uiObserver = null;
+      }
+
+      if (uiObserverTimeoutId) {
+        clearTimeout(uiObserverTimeoutId);
+        uiObserverTimeoutId = null;
+      }
+    }
+
+    function startUIBootstrapObserver() {
+      stopUIBootstrapObserver();
+
+      if (getButtonContainer()) {
+        scheduleSync();
+        return;
+      }
+
+      uiObserver = new MutationObserver(() => {
+        if (!getButtonContainer()) return;
+
+        stopUIBootstrapObserver();
+        scheduleSync();
+      });
+
+      uiObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      uiObserverTimeoutId = setTimeout(() => {
+        stopUIBootstrapObserver();
+      }, 10000);
+    }
+
+    function handleRouteChange() {
+      removeQualityButton();
+      scheduleSync();
+      startUIBootstrapObserver();
+    }
+
+    const originalPushState = history.pushState;
+    history.pushState = function (...args) {
+      const result = originalPushState.apply(this, args);
+      handleRouteChange();
+      return result;
+    };
+
+    const originalReplaceState = history.replaceState;
+    history.replaceState = function (...args) {
+      const result = originalReplaceState.apply(this, args);
+      handleRouteChange();
+      return result;
+    };
+
+    window.addEventListener('popstate', handleRouteChange);
+
+    handleRouteChange();
   }
 
   window.addEventListener('load', () => {
