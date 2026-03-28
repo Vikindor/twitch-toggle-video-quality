@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.2.4
+// @version      1.2.5
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -136,6 +136,10 @@
     return match ? parseInt(match[1], 10) : 0;
   }
 
+  function isOfflineChannelPage() {
+    return !!document.querySelector('.home-offline-hero');
+  }
+
   function removeQualityButton() {
     document.getElementById('quality-toggle-btn')?.remove();
   }
@@ -225,6 +229,7 @@
 
   function insertMinimalButton() {
     if (document.getElementById('quality-toggle-btn')) return;
+    if (isOfflineChannelPage()) return;
   
     const rightGroup = document.querySelector(
       '[data-a-target="player-controls"] .player-controls__right-control-group'
@@ -267,6 +272,7 @@
 
   function insertHeaderButton() {
     if (document.getElementById('quality-toggle-btn')) return;
+    if (isOfflineChannelPage()) return;
 
     const headerRight = document.querySelector(
       '[data-target="channel-header-right"]'
@@ -326,6 +332,11 @@
     function syncButton() {
       syncScheduled = false;
 
+      if (isOfflineChannelPage()) {
+        removeQualityButton();
+        return;
+      }
+
       if (getButtonContainer()) {
         if (VISUAL_MODE === 'minimal') {
           insertMinimalButton();
@@ -358,13 +369,13 @@
     function startUIBootstrapObserver() {
       stopUIBootstrapObserver();
 
-      if (getButtonContainer()) {
+      if (getButtonContainer() || isOfflineChannelPage()) {
         scheduleSync();
         return;
       }
 
       uiObserver = new MutationObserver(() => {
-        if (!getButtonContainer()) return;
+        if (!getButtonContainer() && !isOfflineChannelPage()) return;
 
         stopUIBootstrapObserver();
         scheduleSync();
