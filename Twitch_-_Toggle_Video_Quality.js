@@ -413,6 +413,12 @@
 
     window.addEventListener('popstate', handleRouteChange);
 
+    const headObserver = new MutationObserver(scheduleSync);
+    headObserver.observe(document.head, {
+      childList: true,
+      subtree: true
+    });
+
     handleRouteChange();
   }
 
