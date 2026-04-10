@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.2.5
+// @version      1.2.6
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
 // @supportURL   https://github.com/Vikindor/twitch-toggle-video-quality/issues
-// @license      MIT
+// @license      GPL-3.0
 // @match        https://www.twitch.tv/*
 // @grant        none
 // ==/UserScript==
