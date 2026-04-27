@@ -6,6 +6,13 @@ Userscript that adds a configurable button to Twitch for quickly switching strea
 
 Designed for users who want fast quality control without opening the player settings menu.
 
+---
+
+💥 **New:** This userscript is also available as part of **Twitch Enhancer**, a browser extension for **Chrome** and **Firefox** that combines it with other Twitch quality-of-life improvements.  
+Learn more: [Twitch Enhancer](https://github.com/Vikindor/twitch-enhancer-extension)
+
+---
+
 ## ✨ Features
 
 - Toggle between **lowest available quality** and your **preferred resolution**.
