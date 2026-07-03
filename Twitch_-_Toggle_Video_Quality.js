@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch - Toggle Video Quality
 // @namespace    twitch-toggle-video-quality
-// @version      1.2.6
+// @version      1.2.7
 // @description  Adds a customizable button to toggle stream quality (lowest <-> preferred) with optional auto-mute
 // @author       Vikindor (https://vikindor.github.io/)
 // @homepageURL  https://github.com/Vikindor/twitch-toggle-video-quality/
@@ -74,13 +74,27 @@
     return QUALITY_BUTTON_LABELS[baseLang] || QUALITY_BUTTON_LABELS.en;
   }
 
-  function persistQuality(group) {
+  function persistQuality(quality) {
     if (!PERSIST_SELECTION) return;
+    if (!quality || !quality.group) return;
 
     try {
       localStorage.setItem(
+        'video-quality-highest-available',
+        'false'
+      );
+
+      const bitrate = Number(quality.bitrate);
+      if (Number.isFinite(bitrate) && bitrate > 0) {
+        localStorage.setItem(
+          'quality-bitrate',
+          String(bitrate)
+        );
+      }
+
+      localStorage.setItem(
         'video-quality',
-        JSON.stringify({ default: group })
+        JSON.stringify({ default: quality.group })
       );
     } catch (e) {}
   }
@@ -190,7 +204,7 @@
     if (isCurrentlyLowest) {
       player.setQuality(high);
       player.setMuted(false);
-      persistQuality(high.group);
+      persistQuality(high);
       persistMute(false);
     } else {
       player.setQuality(lowest);
@@ -198,7 +212,7 @@
         player.setMuted(true);
         persistMute(true);
       }
-      persistQuality(lowest.group);
+      persistQuality(lowest);
     }
   }
 
